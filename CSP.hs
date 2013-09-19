@@ -1,5 +1,3 @@
-{-# LANGUAGE PatternGuards #-}
-
 -- | A small and simple CSP solver.
 module CSP where
 
