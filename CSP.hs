@@ -4,7 +4,6 @@
 module CSP where
 
 import Data.Function (on)
-import Data.Maybe    (fromJust)
 import Data.List     (deleteBy,findIndex,intersect,sortBy)
 
 
@@ -91,8 +90,8 @@ prune cs vs = foldl f vs vs
 -- | An example constraint, indicating that two variables, given by name, should be equal.
 eq :: (Eq n, Eq a) => n -> n -> Constraint n a
 eq a b vs = (not . null) (da `intersect` db)
-  where da = fromJust (lookup a vs)
-        db = fromJust (lookup b vs)
+  where Just da = lookup a vs
+        Just db = lookup b vs
 
 
 -- * Example: N-Queens Problem
