@@ -80,6 +80,11 @@ solve cs vs | any undef pre = []
   where pre  = triage (prune cs vs)
         next = findIndex unassigned pre
 
+-- | Solve a CSP problem and return the first solution, if any.
+solve1 :: Eq n => [Constraint n a] -> [Variable n a] -> Maybe [Variable n a]
+solve1 cs vs | (s:_) <- solve cs vs = Just s
+             | otherwise            = Nothing
+
 -- | Prune the search space by removing from the domain of each variable any
 --   value which would immediately violate a constraint.
 prune :: Eq n => [Constraint n a] -> [Variable n a] -> [Variable n a]
