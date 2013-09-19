@@ -87,11 +87,18 @@ prune cs vs = foldl f vs vs
   where f vs v@(n,d) = let vs' = deleteBy sameName v vs
                        in (n, [a | a <- d, check cs ((n, [a]) : vs')]) : vs'
 
--- | An example constraint, indicating that two variables, given by name, should be equal.
+-- | An example constraint, indicating that two variables, given by name,
+--   should be equal.
 eq :: (Eq n, Eq a) => n -> n -> Constraint n a
 eq a b vs = (not . null) (da `intersect` db)
   where Just da = lookup a vs
         Just db = lookup b vs
+
+-- | Given a binary predicate, construct a constraint that it is pairwise
+--   satisfied for all variables.
+pairwise :: (Variable n a -> Variable n a -> Bool) -> Constraint n a
+pairwise f []     = True
+pairwise f (v:vs) = all (f v) vs && pairwise f vs
 
 
 -- * Example: N-Queens Problem
@@ -116,8 +123,7 @@ safe = (not .) . canAttack
 
 -- | A constraint indicating that all queens are pairwise safe.
 allSafe :: [Queen] -> Bool
-allSafe []     = True
-allSafe (q:qs) = all (safe q) qs && allSafe qs
+allSafe = pairwise safe
 
 -- | Find all solutions to the n-queens problem, for a given value of end.
 --   'head' can be used to get a single solution only, for example,
