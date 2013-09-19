@@ -60,6 +60,26 @@ triage = sortBy (compare `on` order)
 --   to a boolean value indicating whether the constraint is satisfied.
 type Constraint n a = [Variable n a] -> Bool
 
+-- | A constraint between two variables, given by name.
+byName2 :: Eq n => n -> n -> ([a] -> [a] -> Bool) -> Constraint n a
+byName2 a b f vs | Just da <- lookup a vs,
+                   Just db <- lookup b vs = f da db
+                 | otherwise = error "Bad variable name."
+
+-- | An example constraint, indicating that two variables should be equal.
+eq :: (Eq n, Eq a) => n -> n -> Constraint n a
+eq a b = byName2 a b f
+  where f da db = (not . null) (da `intersect` db)
+
+-- | Given a binary predicate, construct a constraint that it is pairwise
+--   satisfied for all variables.
+pairwise :: (Variable n a -> Variable n a -> Bool) -> Constraint n a
+pairwise f []     = True
+pairwise f (v:vs) = all (f v) vs && pairwise f vs
+
+
+-- * Solver
+
 -- | Is the problem consistent?
 --   'True' if all constraints are satisfied.
 check :: [Constraint n a] -> [Variable n a] -> Bool
@@ -92,15 +112,3 @@ prune cs vs = foldl f vs vs
   where f vs v@(n,d) = let vs' = deleteBy sameName v vs
                        in (n, [a | a <- d, check cs ((n, [a]) : vs')]) : vs'
 
--- | An example constraint, indicating that two variables, given by name,
---   should be equal.
-eq :: (Eq n, Eq a) => n -> n -> Constraint n a
-eq a b vs = (not . null) (da `intersect` db)
-  where Just da = lookup a vs
-        Just db = lookup b vs
-
--- | Given a binary predicate, construct a constraint that it is pairwise
---   satisfied for all variables.
-pairwise :: (Variable n a -> Variable n a -> Bool) -> Constraint n a
-pairwise f []     = True
-pairwise f (v:vs) = all (f v) vs && pairwise f vs
