@@ -11,7 +11,7 @@ import Data.List     (deleteBy,findIndex,intersect,sortBy)
 -- * Variables
 
 -- | A variable has a name and a list of possible values (its domain).
-type Variable   n a = (n,[a])
+type Variable n a = (n,[a])
 
 -- | The name of a variable.
 name :: Variable n a -> n
@@ -21,7 +21,7 @@ name = fst
 domain :: Variable n a -> [a]
 domain = snd
 
--- | A variable's /order/ is the length of its domain.
+-- | A variable's order is the length of its domain.
 order :: Variable n a -> Int
 order = length . domain
 
@@ -103,7 +103,7 @@ type Col = Int
 -- | A variable in the n-queens problem, representing a single queen.
 --   The variable's name is the queen's row, while its column is the value to
 --   to be assigned.
-type Queen = (Row, [Col])
+type Queen = Variable Row Col
 
 -- | 'True' if the two queens can attack each other.
 --   That is, if they are on the same row, column, or diagonal.
